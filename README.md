@@ -10,7 +10,7 @@ This API returns rarity and sales data for the NFT collection. Sales information
 
 Rules:
 
-- Keep it focused. Desired code style can be inferred from the existing code base. Use modern C# features and follow VS IntelliSense suggestions where appropriate.
+- Keep it focused. Desired code style can be inferred from the existing code base.
 - Keep it light. Try to avoid adding external dependencies unless you really need to.
 - Keep it generic. We, or others, may end up using this code for other NFTs.
 
