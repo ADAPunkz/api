@@ -2,6 +2,7 @@
 using Microsoft.OpenApi.Models;
 using NftApi.Data;
 using NftApi.Data.Seed;
+using NftApi.Data.Services;
 using NftApi.Http.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,7 +14,11 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlite(connectionString);
 });
 
+builder.Services.AddHttpClient<NftMakerProClient>();
 builder.Services.AddHttpClient<CnftIoClient>();
+
+builder.Services.AddScoped<PunkzManager>();
+
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "ADAPunkz API", Version = "v1" });
@@ -42,7 +47,7 @@ var services = scope.ServiceProvider;
 
 try
 {
-    SeedData.Initialize(services);
+    SeedData.InitializePunkz(services);
 }
 catch (Exception ex)
 {

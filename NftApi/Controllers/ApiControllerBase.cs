@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using NftApi.Data;
 
 namespace NftApi.Controllers;
 
@@ -7,10 +6,13 @@ namespace NftApi.Controllers;
 [Route("[controller]")]
 public abstract class ApiControllerBase : ControllerBase
 {
-    protected ApplicationDbContext DbContext { get; }
+    protected const string Edition = "edition";
+    protected const string Rank = "rank";
+    protected const string Price = "price";
+    protected const string ListedAt = "listedAt";
+    protected const string MintedAt = "mintedAt";
+    protected const string OfferCount = "offerCount";
+    protected const string Descending = "desc";
 
-    public ApiControllerBase(ApplicationDbContext dbContext)
-    {
-        DbContext = dbContext;
-    }
+    protected static string NormalizeTrait(string trait) => trait.Trim().ToLower().Replace(" ", "_");
 }

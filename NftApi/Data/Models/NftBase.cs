@@ -19,6 +19,8 @@ public abstract class NftBase
 
     public virtual bool Minted { get; set; }
 
+    public virtual DateTime MintedAt { get; set; }
+
     public virtual bool OnSale { get; set; }
 
     public virtual bool IsAuction { get; set; }

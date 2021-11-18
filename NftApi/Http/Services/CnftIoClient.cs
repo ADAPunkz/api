@@ -5,13 +5,8 @@ using NftApi.Http.Models;
 
 namespace NftApi.Http.Services;
 
-public class CnftIoClient
+public class CnftIoClient : HttpClientBase
 {
-    private static readonly JsonSerializerOptions DefaultSerializerOptions = new()
-    {
-        PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-    };
-
     private readonly HttpClient _httpClient;
 
     public CnftIoClient(HttpClient httpClient) 
@@ -20,8 +15,16 @@ public class CnftIoClient
         _httpClient.BaseAddress = new Uri("https://api.cnft.io");
     }
 
-    public async Task<List<CnftIoListing>> FetchAllListings(CnftIoPayload payload)
+    public async Task<List<CnftIoListing>> FetchAllListings(string projectName)
     {
+        var payload = new CnftIoPayload
+        {
+            Page = 1,
+            Sold = false,
+            Verified = true,
+            Project = projectName
+        };
+
         var responseMessage = await _httpClient.PostAsync("/market/listings",
             new StringContent(
                 JsonSerializer.Serialize(payload, DefaultSerializerOptions),

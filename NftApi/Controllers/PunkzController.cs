@@ -1,41 +1,26 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.ComponentModel;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using NftApi.Data;
+using NftApi.Data.Models;
+using NftApi.Data.Services;
 using NftApi.Extensions;
 using NftApi.Http.Models;
-using NftApi.Data.Models;
-using System.ComponentModel;
 
 namespace NftApi.Controllers;
 
 public class PunkzController : ApiControllerBase
 {
-    private const string Edition = "edition";
-    private const string Rank = "rank";
-    private const string Price = "price";
-    private const string ListedAt = "listedAt";
-    private const string OfferCount = "offerCount";
+    private readonly PunkzManager _punkzManager;
 
-    private const string Descending = "desc";
-
-    public PunkzController(ApplicationDbContext dbContext) : base(dbContext)
-    { }
-
-    private IQueryable<PunkzNft> Punkz => DbContext.PunkzNfts
-        .AsQueryable()
-        .Include(punk => punk.Accessories)
-        .Include(punk => punk.Background)
-        .Include(punk => punk.Eyes)
-        .Include(punk => punk.Head)
-        .Include(punk => punk.ImplantNodes)
-        .Include(punk => punk.Mouth)
-        .Include(punk => punk.Type)
-        .Include(punk => punk.Offers);
+    public PunkzController(PunkzManager punkzManager)
+    {
+        _punkzManager = punkzManager;
+    }
 
     [HttpGet("{id}")]
     public async Task<ActionResult<PunkzNft>> Get(int id)
     {
-        var punk = await Punkz.FirstOrDefaultAsync(punk => punk.Edition == id);
+        var punk = await _punkzManager.FindById(id);
 
         if (punk is null)
         {
@@ -66,7 +51,8 @@ public class PunkzController : ApiControllerBase
         int pageSize = 20)
     {
         var sortDirection = direction == Descending ? ListSortDirection.Descending : ListSortDirection.Ascending;
-        var nfts = Punkz
+        var nfts = _punkzManager
+            .GetAll()
             .WhereIf(!string.IsNullOrEmpty(background), punk => punk.Background.Value.Trim().ToLower().Replace(" ", "_") == NormalizeTrait(background))
             .WhereIf(!string.IsNullOrEmpty(type), punk => punk.Type.Value.Trim().ToLower().Replace(" ", "_") == NormalizeTrait(type))
             .WhereIf(!string.IsNullOrEmpty(mouth), punk => punk.Mouth.Value.Trim().ToLower().Replace(" ", "_") == NormalizeTrait(mouth))
@@ -84,10 +70,12 @@ public class PunkzController : ApiControllerBase
             .OrderByRankIf(sort == Rank, sortDirection)
             .OrderByPriceIf(sort == Price, sortDirection)
             .OrderByListedAtIf(sort == ListedAt, sortDirection)
-            .OrderByOfferCountIf(sort == OfferCount, sortDirection);
+            .OrderByOfferCountIf(sort == OfferCount, sortDirection)
+            .OrderByMintedAtIf(sort == MintedAt, sortDirection);
 
         var count = await nfts.CountAsync();
         var items = await nfts
+            .Cast<PunkzNft>()
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync();
@@ -100,6 +88,4 @@ public class PunkzController : ApiControllerBase
             NextPage = ++page
         });
     }
-
-    private static string NormalizeTrait(string trait) => trait.Trim().ToLower().Replace(" ", "_");
 }

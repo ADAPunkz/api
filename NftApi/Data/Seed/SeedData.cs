@@ -6,7 +6,7 @@ namespace NftApi.Data.Seed;
 
 public static class SeedData
 {
-    public static void Initialize(IServiceProvider serviceProvider)
+    public static void InitializePunkz(IServiceProvider serviceProvider)
     {
         using var context = new ApplicationDbContext(serviceProvider.GetRequiredService<DbContextOptions<ApplicationDbContext>>());
 
@@ -88,6 +88,8 @@ public static class SeedData
             {
                 punkzNft.Type = type;
             }
+
+            punkzNft.Minted = true;
 
             context.PunkzNfts.Add(punkzNft);
         }

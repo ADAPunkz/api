@@ -1,8 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using NftApi.Data;
-using NftApi.Data.Models;
-using NftApi.Http.Models;
+using NftApi.Data.Services;
 using NftApi.Http.Services;
 
 namespace NftApi.Controllers;
@@ -10,83 +7,54 @@ namespace NftApi.Controllers;
 [ApiExplorerSettings(IgnoreApi = true)]
 public class WebhookController : ApiControllerBase
 {
-    private readonly ILogger<WebhookController> _logger;
-    private readonly CnftIoClient _cnftIoClient;
+    private readonly IConfiguration _configuration;
 
-    public WebhookController(ApplicationDbContext dbContext, CnftIoClient cnftIoClient, ILogger<WebhookController> logger) : base(dbContext)
+    private readonly PunkzManager _punkzManager;
+
+    private readonly CnftIoClient _cnftIoClient;
+    private readonly NftMakerProClient _nftMakerProClient;
+
+    public WebhookController(
+        IConfiguration configuration,
+        PunkzManager punkzManager,
+        CnftIoClient cnftIoClient,
+        NftMakerProClient nftMakerProClient)
     {
+        _configuration = configuration;
+        _punkzManager = punkzManager;
         _cnftIoClient = cnftIoClient;
-        _logger = logger;
+        _nftMakerProClient = nftMakerProClient;
     }
 
-    [HttpGet("[action]")]
-    public async Task<IActionResult> Sales()
+    [HttpGet("[action]/{id}")]
+    public async Task<StatusCodeResult> Sales(string id)
     {
-        var results = await _cnftIoClient.FetchAllListings(new CnftIoPayload
+        switch (id)
         {
-            Page = 1,
-            Project = "ADAPunkz",
-            Sold = false,
-            Verified = true
-        });
-
-        var processedIds = new List<int>();
-
-        foreach (var result in results)
-        {
-            var name = result.Asset.AssetId["ADAPunk".Length..];
-            var edition = int.Parse(name);
-
-            var punk = await DbContext.PunkzNfts.Include(punk => punk.Offers).FirstOrDefaultAsync(punk => punk.Edition == edition);
-
-            if (punk.Offers is not null && punk.Offers.Count > 0)
-            {
-                DbContext.Offers.RemoveRange(punk.Offers);
-            }
-
-            punk.Minted = true;
-            punk.OnSale = true;
-            punk.SalePrice = (int)(result.Price / 1000000);
-            punk.MarketId = result.Id;
-            punk.ListedAt = result.CreatedAt;
-            punk.IsAuction = result.IsAuction;
-            punk.Offers = result.Offers.Select(offer => offer.Normalize()).ToList();
-
-            DbContext.Update(punk);
-            processedIds.Add(edition);
+            case "punkz":
+                var listings = await _cnftIoClient.FetchAllListings("ADAPunkz");
+                await _punkzManager.UpdateSales(listings);
+                break;
         }
-
-        var offMarketNfts = await DbContext.PunkzNfts
-            .Include(punk => punk.Offers)
-            .Where(punk => !processedIds.Contains(punk.Edition))
-            .ToListAsync();
-
-        foreach (var punk in offMarketNfts)
-        {
-            if (punk.Offers is not null && punk.Offers.Count > 0)
-            {
-                DbContext.Offers.RemoveRange(punk.Offers);
-            }
-
-            punk.Minted = true;
-            punk.OnSale = false;
-            punk.SalePrice = 0;
-            punk.MarketId = null;
-            punk.ListedAt = null;
-            punk.IsAuction = false;
-            punk.Offers = new List<Offer>();
-
-            DbContext.Update(punk);
-        }
-
-        await DbContext.SaveChangesAsync();
 
         return StatusCode(200);
     }
 
-    [HttpGet("[action]")]
-    public async Task<IActionResult> Mint()
+    [HttpGet("[action]/{id}")]
+    public async Task<StatusCodeResult> Mint(string id)
     {
-        throw new NotImplementedException();
+        var apiKey = _configuration[$"NftMakerPro:{id}:ApiKey"];
+        var projectId = _configuration[$"NftMakerPro:{id}:ProjectId"];
+
+        var results = await _nftMakerProClient.FetchAllNfts(apiKey, projectId);
+
+        switch (id)
+        {
+            case "punkz":
+                await _punkzManager.UpdateMint(results);
+                break;
+        }
+
+        return StatusCode(200);
     }
 }

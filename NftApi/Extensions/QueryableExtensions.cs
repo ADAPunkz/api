@@ -16,7 +16,7 @@ public static class QueryableExtensions
         return source;
     }
     
-    public static IQueryable<PunkzNft> OrderByEditionIf(this IQueryable<PunkzNft> source, bool condition, ListSortDirection direction)
+    public static IQueryable<NftBase> OrderByEditionIf(this IQueryable<NftBase> source, bool condition, ListSortDirection direction)
     {
         if (!condition)
         {
@@ -25,13 +25,13 @@ public static class QueryableExtensions
 
         if (direction == ListSortDirection.Descending)
         {
-            return source.OrderBy(punk => punk.Edition);
+            return source.OrderBy(nft => nft.Edition);
         }
 
-        return source.OrderBy(punk => punk.Edition);
+        return source.OrderBy(nft => nft.Edition);
     }
 
-    public static IQueryable<PunkzNft> OrderByRankIf(this IQueryable<PunkzNft> source, bool condition, ListSortDirection direction)
+    public static IQueryable<NftBase> OrderByRankIf(this IQueryable<NftBase> source, bool condition, ListSortDirection direction)
     {
         if (!condition)
         {
@@ -40,13 +40,13 @@ public static class QueryableExtensions
 
         if (direction == ListSortDirection.Descending)
         {
-            return source.OrderByDescending(punk => punk.Rank);
+            return source.OrderByDescending(nft => nft.Rank);
         }
 
-        return source.OrderBy(punk => punk.Rank);
+        return source.OrderBy(nft => nft.Rank);
     }
 
-    public static IQueryable<PunkzNft> OrderByPriceIf(this IQueryable<PunkzNft> source, bool condition, ListSortDirection direction)
+    public static IQueryable<NftBase> OrderByPriceIf(this IQueryable<NftBase> source, bool condition, ListSortDirection direction)
     {
         if (!condition)
         {
@@ -56,13 +56,13 @@ public static class QueryableExtensions
 
         if (direction == ListSortDirection.Descending)
         {
-            return source.OrderByDescending(punk => punk.SalePrice);
+            return source.OrderByDescending(nft => nft.SalePrice);
         }
 
-        return source.OrderBy(punk => punk.SalePrice);
+        return source.OrderBy(nft => nft.SalePrice);
     }
 
-    public static IQueryable<PunkzNft> OrderByListedAtIf(this IQueryable<PunkzNft> source, bool condition, ListSortDirection direction)
+    public static IQueryable<NftBase> OrderByListedAtIf(this IQueryable<NftBase> source, bool condition, ListSortDirection direction)
     {
         if (!condition)
         {
@@ -72,13 +72,13 @@ public static class QueryableExtensions
 
         if (direction == ListSortDirection.Descending)
         {
-            return source.OrderByDescending(punk => punk.ListedAt);
+            return source.OrderByDescending(nft => nft.ListedAt);
         }
 
-        return source.OrderBy(punk => punk.ListedAt);
+        return source.OrderBy(nft => nft.ListedAt);
     }
 
-    public static IQueryable<PunkzNft> OrderByOfferCountIf(this IQueryable<PunkzNft> source, bool condition, ListSortDirection direction)
+    public static IQueryable<NftBase> OrderByOfferCountIf(this IQueryable<NftBase> source, bool condition, ListSortDirection direction)
     {
         if (!condition)
         {
@@ -88,9 +88,25 @@ public static class QueryableExtensions
 
         if (direction == ListSortDirection.Descending)
         {
-            return source.OrderByDescending(punk => punk.Offers.Count);
+            return source.OrderByDescending(nft => nft.Offers.Count);
         }
 
-        return source.OrderBy(punk => punk.Offers.Count);
+        return source.OrderBy(nft => nft.Offers.Count);
+    }
+
+    public static IQueryable<NftBase> OrderByMintedAtIf(this IQueryable<NftBase> source, bool condition, ListSortDirection direction)
+    {
+        if (!condition)
+        {
+            return source;
+
+        }
+
+        if (direction == ListSortDirection.Descending)
+        {
+            return source.OrderByDescending(nft => nft.MintedAt);
+        }
+
+        return source.OrderBy(nft => nft.MintedAt);
     }
 }
