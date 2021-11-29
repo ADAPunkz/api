@@ -8,17 +8,30 @@ public abstract class NftManagerBase<T> where T : NftBase
 {
     protected ApplicationDbContext Context { get; }
 
-    protected NftManagerBase(ApplicationDbContext context)
+    protected DbSet<T> Nfts { get; }
+
+    protected NftManagerBase(ApplicationDbContext context, DbSet<T> nfts, string projectName, string tokenPrefix)
     {
         Context = context;
+        Nfts = nfts;
+        ProjectName = projectName;
+        TokenPrefix = tokenPrefix;
     }
 
-    protected async Task UpdateMint(DbSet<T> set, List<GetNftsResponse> response)
+    public string TokenPrefix { get; }
+
+    public string ProjectName { get; }
+
+    public IQueryable<T> Query => Nfts.AsQueryable();
+
+    public Task<T> FindById(int id) => Query.FirstOrDefaultAsync(nft => nft.Edition == id);
+
+    public virtual async Task UpdateMint(List<GetNftsResponse> response)
     {
         foreach (var nft in response)
         {
             var edition = int.Parse(nft.Name);
-            var match = await set.FindAsync(edition);
+            var match = await Nfts.FindAsync(edition);
 
             match.Minted = nft.Minted;
 
@@ -36,16 +49,16 @@ public abstract class NftManagerBase<T> where T : NftBase
         await Context.SaveChangesAsync();
     }
 
-    protected async Task UpdateSales(DbSet<T> set, List<CnftIoListing> listings, string tokenPrefix)
+    public virtual async Task UpdateSales(List<CnftIoListing> listings)
     {
         var processedIds = new List<int>();
 
         foreach (var listing in listings)
         {
-            var name = listing.Asset.AssetId[tokenPrefix.Length..];
+            var name = listing.Asset.AssetId[TokenPrefix.Length..];
             var edition = int.Parse(name);
 
-            var nft = await set.Include(nft => nft.Offers).FirstOrDefaultAsync(nft => nft.Edition == edition);
+            var nft = await Nfts.Include(nft => nft.Offers).FirstOrDefaultAsync(nft => nft.Edition == edition);
 
             if (nft.Offers is not null && nft.Offers.Count > 0)
             {
@@ -64,7 +77,7 @@ public abstract class NftManagerBase<T> where T : NftBase
             processedIds.Add(edition);
         }
 
-        var offMarketNfts = await set
+        var offMarketNfts = await Nfts
             .Include(nft => nft.Offers)
             .Where(nft => !processedIds.Contains(nft.Edition))
             .ToListAsync();
@@ -88,6 +101,8 @@ public abstract class NftManagerBase<T> where T : NftBase
 
         await Context.SaveChangesAsync();
     }
+
+    public virtual Task UpdateRarity() => throw new NotImplementedException($"A custom rarity update implementation has not been provided for the {ProjectName} collection");
 
     protected static void CalculateAttributeScores(int nftsCount, params Dictionary<string, AttributeRarityData>[] attributes)
     {

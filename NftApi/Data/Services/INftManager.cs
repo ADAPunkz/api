@@ -9,13 +9,13 @@ public interface INftManager<T> where T : NftBase
 
     string TokenPrefix { get; }
 
-    Task<T> FindById(int id);
+    IQueryable<T> Query { get; }
 
-    IQueryable<T> GetAll();
+    Task<T> FindById(int id);
 
     Task UpdateMint(List<GetNftsResponse> nfts);
 
-    Task UpdateRarity();
-
     Task UpdateSales(List<CnftIoListing> listings);
+
+    Task UpdateRarity();
 }
