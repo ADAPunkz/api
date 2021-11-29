@@ -8,6 +8,7 @@ using NftApi.Http.Models;
 
 namespace NftApi.Controllers;
 
+[ApiExplorerSettings(IgnoreApi = true)]
 public class PunkzController : ApiControllerBase
 {
     private readonly PunkzManager _punkzManager;
@@ -65,19 +66,18 @@ public class PunkzController : ApiControllerBase
             .WhereIf(onSale.HasValue, punk => punk.OnSale == onSale.Value)
             .WhereIf(isAuction.HasValue, punk => punk.IsAuction == isAuction.Value)
             .WhereIf(minPrice > 0, punk => punk.SalePrice >= minPrice)
-            .WhereIf(maxPrice > 0, punk => punk.SalePrice <= maxPrice)
+            .WhereIf(maxPrice > 0, punk => punk.SalePrice <= maxPrice);
+
+        var count = await nfts.CountAsync();
+        var items = await nfts
             .OrderByEditionIf(sort == Edition, sortDirection)
             .OrderByRankIf(sort == Rank, sortDirection)
             .OrderByPriceIf(sort == Price, sortDirection)
             .OrderByListedAtIf(sort == ListedAt, sortDirection)
             .OrderByOfferCountIf(sort == OfferCount, sortDirection)
-            .OrderByMintedAtIf(sort == MintedAt, sortDirection);
-
-        var count = await nfts.CountAsync();
-        var items = await nfts
-            .Cast<PunkzNft>()
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
+            .Cast<PunkzNft>()
             .ToListAsync();
 
         return Ok(new NftList<PunkzNft>
