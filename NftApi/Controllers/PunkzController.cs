@@ -8,7 +8,6 @@ using NftApi.Http.Models;
 
 namespace NftApi.Controllers;
 
-[ApiExplorerSettings(IgnoreApi = true)]
 public class PunkzController : ApiControllerBase
 {
     private readonly PunkzManager _punkzManager;
@@ -53,7 +52,7 @@ public class PunkzController : ApiControllerBase
     {
         var sortDirection = direction == Descending ? ListSortDirection.Descending : ListSortDirection.Ascending;
         var nfts = _punkzManager
-            .GetAll()
+            .Query
             .WhereIf(!string.IsNullOrEmpty(background), punk => punk.Background.Value.Trim().ToLower().Replace(" ", "_") == NormalizeTrait(background))
             .WhereIf(!string.IsNullOrEmpty(type), punk => punk.Type.Value.Trim().ToLower().Replace(" ", "_") == NormalizeTrait(type))
             .WhereIf(!string.IsNullOrEmpty(mouth), punk => punk.Mouth.Value.Trim().ToLower().Replace(" ", "_") == NormalizeTrait(mouth))
