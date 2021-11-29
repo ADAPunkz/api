@@ -21,7 +21,12 @@ public abstract class NftManagerBase<T> where T : NftBase
             var match = await set.FindAsync(edition);
 
             match.Minted = nft.Minted;
-            match.MintedAt = DateTime.UtcNow;
+
+            if (nft.Minted && !match.MintedAt.HasValue)
+            {
+                match.MintedAt = DateTime.UtcNow;
+            }
+
             match.Ipfs = nft.IpfsLink;
             match.Image = nft.GatewayLink;
 
@@ -60,7 +65,6 @@ public abstract class NftManagerBase<T> where T : NftBase
         }
 
         var offMarketNfts = await set
-            .AsQueryable()
             .Include(nft => nft.Offers)
             .Where(nft => !processedIds.Contains(nft.Edition))
             .ToListAsync();
@@ -83,5 +87,42 @@ public abstract class NftManagerBase<T> where T : NftBase
         }
 
         await Context.SaveChangesAsync();
+    }
+
+    protected static void CalculateAttributeScores(int nftsCount, params Dictionary<string, AttributeRarityData>[] attributes)
+    {
+        foreach (var attribute in attributes)
+        {
+            foreach (var entry in attribute)
+            {
+                var occurrences = entry.Value.Occurrences;
+                decimal probability = (decimal)occurrences / nftsCount;
+
+                entry.Value.Score = Math.Round(1 / probability, 2);
+                entry.Value.Percent = Math.Round(probability * 100, 2);
+            }
+        }
+    }
+
+    protected void SetRankFromScore(List<T> nfts)
+    {
+        var ordered = nfts.OrderByDescending(nft => nft.Score);
+
+        for (var i = 0; i < ordered.Count(); i++)
+        {
+            var nft = ordered.ElementAt(i);
+            nft.Rank = i + 1;
+        }
+
+        Context.UpdateRange(ordered);
+    }
+
+    protected class AttributeRarityData
+    {
+        public int Occurrences { get; set; }
+
+        public decimal Percent { get; set; }
+
+        public decimal Score { get; set; }
     }
 }

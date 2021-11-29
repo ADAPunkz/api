@@ -28,7 +28,12 @@ var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
-    app.UseDeveloperExceptionPage();
+    app.UseCors(options => options.AllowAnyOrigin());
+    app.UseExceptionHandler("/error-local-development");
+}
+else
+{
+    app.UseExceptionHandler("/error");
 }
 
 app.UseSwagger();
