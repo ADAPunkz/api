@@ -69,7 +69,7 @@ public abstract class NftManagerBase<T> where T : NftBase
             nft.OnSale = true;
             nft.SalePrice = (int)(listing.Price / 1000000);
             nft.MarketId = listing.Id;
-            nft.ListedAt = listing.CreatedAt;
+            nft.ListedAt = listing.CreatedAt ?? listing.UpdatedAt;
             nft.IsAuction = listing.IsAuction;
             nft.Offers = listing.Offers.Select(offer => offer.Normalize()).ToList();
 

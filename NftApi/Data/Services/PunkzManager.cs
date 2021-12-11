@@ -5,8 +5,8 @@ namespace NftApi.Data.Services;
 
 public class PunkzManager : NftManagerBase<PunkzNft>, INftManager<PunkzNft>
 {
-    public const string PROJECT_NAME = "ADAPunkz";
-    public const string TOKEN_PREFIX = "ADAPunk";
+    private const string PROJECT_NAME = "ADAPunkz";
+    private const string TOKEN_PREFIX = "ADAPunk";
 
     public PunkzManager(ApplicationDbContext dbContext) : base(dbContext, dbContext.PunkzNfts, PROJECT_NAME, TOKEN_PREFIX)
     { }
@@ -20,4 +20,6 @@ public class PunkzManager : NftManagerBase<PunkzNft>, INftManager<PunkzNft>
         .Include(punk => punk.Mouth)
         .Include(punk => punk.Type)
         .Include(punk => punk.Offers);
+
+    public new Task<PunkzNft> FindById(int id) => Query.FirstOrDefaultAsync(nft => nft.Edition == id);
 }
