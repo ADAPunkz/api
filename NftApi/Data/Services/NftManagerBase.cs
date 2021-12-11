@@ -4,7 +4,7 @@ using NftApi.Http.Models;
 
 namespace NftApi.Data.Services;
 
-public abstract class NftManagerBase<T> where T : NftBase
+public abstract class NftManagerBase<T> : INftManager<T> where T : NftBase
 {
     protected ApplicationDbContext Context { get; }
 

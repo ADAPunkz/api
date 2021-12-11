@@ -3,7 +3,7 @@ using NftApi.Data.Models;
 
 namespace NftApi.Data.Services;
 
-public class PunkzManager : NftManagerBase<PunkzNft>, INftManager<PunkzNft>
+public class PunkzManager : NftManagerBase<PunkzNft>
 {
     private const string PROJECT_NAME = "ADAPunkz";
     private const string TOKEN_PREFIX = "ADAPunk";
