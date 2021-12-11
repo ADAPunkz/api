@@ -4,7 +4,7 @@ using NftApi.Http.Models;
 
 namespace NftApi.Data.Services;
 
-public abstract class NftManagerBase<T> where T : NftBase
+public abstract class NftManagerBase<T> : INftManager<T> where T : NftBase
 {
     protected ApplicationDbContext Context { get; }
 
@@ -69,7 +69,7 @@ public abstract class NftManagerBase<T> where T : NftBase
             nft.OnSale = true;
             nft.SalePrice = (int)(listing.Price / 1000000);
             nft.MarketId = listing.Id;
-            nft.ListedAt = listing.CreatedAt;
+            nft.ListedAt = listing.CreatedAt ?? listing.UpdatedAt;
             nft.IsAuction = listing.IsAuction;
             nft.Offers = listing.Offers.Select(offer => offer.Normalize()).ToList();
 
