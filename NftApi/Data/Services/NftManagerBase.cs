@@ -6,10 +6,6 @@ namespace NftApi.Data.Services;
 
 public abstract class NftManagerBase<T> : INftManager<T> where T : NftBase
 {
-    protected ApplicationDbContext Context { get; }
-
-    protected DbSet<T> Nfts { get; }
-
     protected NftManagerBase(ApplicationDbContext context, DbSet<T> nfts, string projectName, string tokenPrefix)
     {
         Context = context;
@@ -18,20 +14,32 @@ public abstract class NftManagerBase<T> : INftManager<T> where T : NftBase
         TokenPrefix = tokenPrefix;
     }
 
+    protected ApplicationDbContext Context { get; }
+
+    protected DbSet<T> Nfts { get; }
+
     public string TokenPrefix { get; }
 
     public string ProjectName { get; }
 
     public IQueryable<T> Query => Nfts.AsQueryable();
 
-    public Task<T> FindById(int id) => Query.FirstOrDefaultAsync(nft => nft.Edition == id);
+    public Task<T> FindById(int id)
+    {
+        return Query.FirstOrDefaultAsync(nft => nft.Edition == id);
+    }
 
-    public virtual async Task UpdateMint(List<GetNftsResponse> response)
+    public virtual async Task UpdateMint(List<NftMakerProNft> response)
     {
         foreach (var nft in response)
         {
             var edition = int.Parse(nft.Name);
             var match = await Nfts.FindAsync(edition);
+
+            if (match is null)
+            {
+                continue;
+            }
 
             match.Minted = nft.Minted;
 
@@ -57,23 +65,32 @@ public abstract class NftManagerBase<T> : INftManager<T> where T : NftBase
         {
             var name = listing.Asset.AssetId[TokenPrefix.Length..];
             var edition = int.Parse(name);
+            var match = await Nfts
+                .Include(nft => nft.Offers)
+                .FirstOrDefaultAsync(nft => nft.Edition == edition);
 
-            var nft = await Nfts.Include(nft => nft.Offers).FirstOrDefaultAsync(nft => nft.Edition == edition);
-
-            if (nft.Offers is not null && nft.Offers.Count > 0)
+            if (match is null)
             {
-                Context.Offers.RemoveRange(nft.Offers);
+                continue;
             }
 
-            nft.Minted = true;
-            nft.OnSale = true;
-            nft.SalePrice = (int)(listing.Price / 1000000);
-            nft.MarketId = listing.Id;
-            nft.ListedAt = listing.CreatedAt ?? listing.UpdatedAt;
-            nft.IsAuction = listing.IsAuction;
-            nft.Offers = listing.Offers.Select(offer => offer.Normalize()).ToList();
+            if (match.Offers is not null && match.Offers.Count > 0)
+            {
+                Context.Offers.RemoveRange(match.Offers);
+            }
 
-            Context.Update(nft);
+            match.Minted = true;
+            match.OnSale = true;
+            match.SalePrice = (int)(listing.Price / 1000000);
+            match.MarketId = listing.Id;
+            match.ListedAt = listing.CreatedAt ?? listing.UpdatedAt;
+            match.IsAuction = listing.IsAuction;
+            match.Offers = listing.Offers
+                .Select(offer => offer.Normalize())
+                .Where(offer => offer.Expires > DateTime.UtcNow)
+                .ToList();
+
+            Context.Update(match);
             processedIds.Add(edition);
         }
 
@@ -102,28 +119,35 @@ public abstract class NftManagerBase<T> : INftManager<T> where T : NftBase
         await Context.SaveChangesAsync();
     }
 
-    public virtual Task UpdateRarity() => throw new NotImplementedException($"A custom rarity update implementation has not been provided for the {ProjectName} collection");
+    public virtual Task UpdateRarity()
+    {
+        throw new NotImplementedException(
+            $"A custom rarity update implementation has not been provided for the {ProjectName} collection");
+    }
 
-    protected static void CalculateAttributeScores(int nftsCount, params Dictionary<string, AttributeRarityData>[] attributes)
+    protected static void CalculateAttributeScores(int nftsCount,
+        params Dictionary<string, AttributeRarityData>[] attributes)
     {
         foreach (var attribute in attributes)
         {
-            foreach (var entry in attribute)
+            foreach (var (_, value) in attribute)
             {
-                var occurrences = entry.Value.Occurrences;
-                decimal probability = (decimal)occurrences / nftsCount;
+                var occurrences = value.Occurrences;
+                var probability = (decimal)occurrences / nftsCount;
 
-                entry.Value.Score = Math.Round(1 / probability, 2);
-                entry.Value.Percent = Math.Round(probability * 100, 2);
+                value.Score = Math.Round(1 / probability, 2);
+                value.Percent = Math.Round(probability * 100, 2);
             }
         }
     }
 
-    protected void SetRankFromScore(List<T> nfts)
+    protected void SetRankFromScore(IEnumerable<T> nfts)
     {
-        var ordered = nfts.OrderByDescending(nft => nft.Score);
+        var ordered = nfts
+            .OrderByDescending(nft => nft.Score)
+            .ToList();
 
-        for (var i = 0; i < ordered.Count(); i++)
+        for (var i = 0; i < ordered.Count; i++)
         {
             var nft = ordered.ElementAt(i);
             nft.Rank = i + 1;

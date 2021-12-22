@@ -16,12 +16,16 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 builder.Services.AddHttpClient<NftMakerProClient>();
 builder.Services.AddHttpClient<CnftIoClient>();
+builder.Services.AddHttpClient<BlockfrostClient>();
 
 builder.Services.AddScoped<PunkzManager>();
 
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "ADAPunkz API", Version = "v1" });
+    c.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "ADAPunkz API", Version = "v1"
+    });
 });
 
 var app = builder.Build();
@@ -52,12 +56,12 @@ var services = scope.ServiceProvider;
 
 try
 {
-    SeedData.InitializePunkz(services);
+    await SeedData.InitializePunkz(services);
 }
 catch (Exception ex)
 {
     var logger = services.GetRequiredService<ILogger<Program>>();
-    logger.LogError(ex, "An error occurred seeding the DB.");
+    logger.LogError(ex, "An error occurred seeding the DB");
 }
 
 app.Run();

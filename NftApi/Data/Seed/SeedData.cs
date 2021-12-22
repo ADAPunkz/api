@@ -1,16 +1,16 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Text.Json;
+using Microsoft.EntityFrameworkCore;
 using NftApi.Data.Models;
-using System.Text.Json;
 
 namespace NftApi.Data.Seed;
 
 public static class SeedData
 {
-    public static void InitializePunkz(IServiceProvider serviceProvider)
+    public static async Task InitializePunkz(IServiceProvider serviceProvider)
     {
-        using var context = new ApplicationDbContext(serviceProvider.GetRequiredService<DbContextOptions<ApplicationDbContext>>());
+        await using var context = new ApplicationDbContext(serviceProvider.GetRequiredService<DbContextOptions<ApplicationDbContext>>());
 
-        context.Database.Migrate();
+        await context.Database.MigrateAsync();
 
         if (context.PunkzNfts.Any())
         {
@@ -18,15 +18,20 @@ public static class SeedData
         }
 
         var path = Path.Combine(Environment.CurrentDirectory, "Data", "Seed", "punkz.json");
-        var text = File.ReadAllText(path);
+        var text = await File.ReadAllTextAsync(path);
         var enumerable = JsonSerializer.Deserialize<IEnumerable<PunkzNft>>(text, new JsonSerializerOptions
         {
             PropertyNameCaseInsensitive = true
         });
 
+        if (enumerable is null)
+        {
+            return;
+        }
+
         foreach (var punkzNft in enumerable)
         {
-            if (context.Traits.Find(punkzNft.Accessories.Value) is not Trait accessories)
+            if (await context.Traits.FindAsync(punkzNft.Accessories.Value) is not { } accessories)
             {
                 context.Traits.Add(punkzNft.Accessories);
             }
@@ -35,7 +40,7 @@ public static class SeedData
                 punkzNft.Accessories = accessories;
             }
 
-            if (context.Traits.Find(punkzNft.Background.Value) is not Trait background)
+            if (await context.Traits.FindAsync(punkzNft.Background.Value) is not { } background)
             {
                 context.Traits.Add(punkzNft.Background);
             }
@@ -44,7 +49,7 @@ public static class SeedData
                 punkzNft.Background = background;
             }
 
-            if (context.Traits.Find(punkzNft.Eyes.Value) is not Trait eyes)
+            if (await context.Traits.FindAsync(punkzNft.Eyes.Value) is not { } eyes)
             {
                 context.Traits.Add(punkzNft.Eyes);
             }
@@ -53,7 +58,7 @@ public static class SeedData
                 punkzNft.Eyes = eyes;
             }
 
-            if (context.Traits.Find(punkzNft.Head.Value) is not Trait head)
+            if (await context.Traits.FindAsync(punkzNft.Head.Value) is not { } head)
             {
                 context.Traits.Add(punkzNft.Head);
             }
@@ -62,7 +67,7 @@ public static class SeedData
                 punkzNft.Head = head;
             }
 
-            if (context.Traits.Find(punkzNft.ImplantNodes.Value) is not Trait implantNodes)
+            if (await context.Traits.FindAsync(punkzNft.ImplantNodes.Value) is not { } implantNodes)
             {
                 context.Traits.Add(punkzNft.ImplantNodes);
             }
@@ -71,7 +76,7 @@ public static class SeedData
                 punkzNft.ImplantNodes = implantNodes;
             }
 
-            if (context.Traits.Find(punkzNft.Mouth.Value) is not Trait mouth)
+            if (await context.Traits.FindAsync(punkzNft.Mouth.Value) is not { } mouth)
             {
                 context.Traits.Add(punkzNft.Mouth);
             }
@@ -80,7 +85,7 @@ public static class SeedData
                 punkzNft.Mouth = mouth;
             }
 
-            if (context.Traits.Find(punkzNft.Type.Value) is not Trait type)
+            if (await context.Traits.FindAsync(punkzNft.Type.Value) is not { } type)
             {
                 context.Traits.Add(punkzNft.Type);
             }
@@ -89,11 +94,12 @@ public static class SeedData
                 punkzNft.Type = type;
             }
 
+            // the whole collection is already minted
             punkzNft.Minted = true;
 
             context.PunkzNfts.Add(punkzNft);
         }
 
-        context.SaveChanges();
+        await context.SaveChangesAsync();
     }
 }

@@ -7,13 +7,12 @@ namespace NftApi.Controllers;
 [ApiExplorerSettings(IgnoreApi = true)]
 public class WebhookController : ApiControllerBase
 {
-    private readonly PunkzManager _punkzManager;
     private readonly CnftIoClient _cnftIoClient;
+    private readonly PunkzManager _punkzManager;
 
     public WebhookController(
         PunkzManager punkzManager,
-        CnftIoClient cnftIoClient,
-        NftMakerProClient nftMakerProClient)
+        CnftIoClient cnftIoClient)
     {
         _punkzManager = punkzManager;
         _cnftIoClient = cnftIoClient;

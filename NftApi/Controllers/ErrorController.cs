@@ -7,7 +7,7 @@ namespace NftApi.Controllers;
 public class ErrorController : ApiControllerBase
 {
     [Route("/error-local-development")]
-    public IActionResult ErrorLocalDevelopment([FromServices]IWebHostEnvironment webHostEnvironment)
+    public IActionResult ErrorLocalDevelopment([FromServices] IWebHostEnvironment webHostEnvironment)
     {
         if (webHostEnvironment.EnvironmentName != "Development")
         {
@@ -16,11 +16,12 @@ public class ErrorController : ApiControllerBase
 
         var context = HttpContext.Features.Get<IExceptionHandlerFeature>();
 
-        return Problem(
-            detail: context.Error.StackTrace,
-            title: context.Error.Message);
+        return Problem(context?.Error.StackTrace, title: context?.Error.Message);
     }
 
     [Route("/error")]
-    public IActionResult Error() => Problem();
+    public IActionResult Error()
+    {
+        return Problem();
+    }
 }

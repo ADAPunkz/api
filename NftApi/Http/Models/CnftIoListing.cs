@@ -21,11 +21,5 @@ public class CnftIoListing
 
     public List<CnftIoOffer> Offers { get; set; }
 
-    public bool IsAuction
-    {
-        get
-        {
-            return Type == "auction" || Type == "offer";
-        }
-    }
+    public bool IsAuction => Type is "auction" or "offer";
 }

@@ -5,7 +5,7 @@ namespace NftApi.Data.Models;
 public class Trait
 {
     [Key]
-    public virtual string Value { get; set; }
+    public string Value { get; set; }
 
-    public virtual decimal Percent { get; set; }
+    public decimal Percent { get; set; }
 }
