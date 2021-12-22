@@ -1,6 +1,6 @@
 ﻿namespace NftApi.Http.Models;
 
-public class GetNftsResponse
+public class NftMakerProNft
 {
     public string Name { get; set; }
 

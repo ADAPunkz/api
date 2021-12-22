@@ -5,9 +5,9 @@ namespace NftApi.Data.Models;
 public class Offer
 {
     [Key]
-    public virtual Guid Id { get; set; }
+    public Guid Id { get; set; }
 
-    public virtual long Value { get; set; }
+    public long Value { get; set; }
 
-    public virtual DateTime Expires { get; set; }
+    public DateTime Expires { get; set; }
 }

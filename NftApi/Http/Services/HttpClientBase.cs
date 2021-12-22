@@ -8,4 +8,12 @@ public abstract class HttpClientBase
     {
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase
     };
+
+    protected HttpClientBase(HttpClient httpClient, string baseAddress)
+    {
+        HttpClient = httpClient;
+        HttpClient.BaseAddress = new Uri(baseAddress);
+    }
+
+    protected HttpClient HttpClient { get; }
 }
