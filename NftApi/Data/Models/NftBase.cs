@@ -27,9 +27,11 @@ public abstract class NftBase
 
     public int SalePrice { get; set; }
 
-    public string MarketId { get; set; }
+    public string MarketUrl { get; set; }
 
     public DateTime? ListedAt { get; set; }
+
+    public string MarketName { get; set; }
 
     public List<Offer> Offers { get; set; } = new();
 }

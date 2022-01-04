@@ -10,8 +10,8 @@ public class ChestController : ApiControllerBase
     private readonly IConfiguration _configuration;
 
     public ChestController(
-        IConfiguration configuration,
-        BlockfrostClient blockfrostClient)
+        BlockfrostClient blockfrostClient,
+        IConfiguration configuration)
     {
         _configuration = configuration;
         _blockfrostClient = blockfrostClient;

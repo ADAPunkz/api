@@ -16,6 +16,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 builder.Services.AddHttpClient<NftMakerProClient>();
 builder.Services.AddHttpClient<CnftIoClient>();
+builder.Services.AddHttpClient<JpgStoreClient>();
 builder.Services.AddHttpClient<BlockfrostClient>();
 
 builder.Services.AddScoped<PunkzManager>();

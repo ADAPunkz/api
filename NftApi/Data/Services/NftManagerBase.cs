@@ -57,21 +57,33 @@ public abstract class NftManagerBase<T> : INftManager<T> where T : NftBase
         await Context.SaveChangesAsync();
     }
 
-    public virtual async Task UpdateSales(List<CnftIoListing> listings)
+    public virtual async Task UpdateSales(List<NormalizedListing> listings, string marketName, bool preferredMarket = false)
     {
         var processedIds = new List<int>();
 
         foreach (var listing in listings)
         {
-            var name = listing.Asset.AssetId[TokenPrefix.Length..];
-            var edition = int.Parse(name);
             var match = await Nfts
                 .Include(nft => nft.Offers)
-                .FirstOrDefaultAsync(nft => nft.Edition == edition);
+                .FirstOrDefaultAsync(nft => nft.Edition == listing.Edition);
 
             if (match is null)
             {
                 continue;
+            }
+
+            // when the match is currently active on another market, and this isn't a 'preferred' market, we skip
+            // if it is a preffered market, then we need to clear all existing sales data first
+            if (!string.IsNullOrEmpty(match.MarketName) && match.MarketName != marketName)
+            {
+                if (preferredMarket)
+                {
+                    ResetSales(match);
+                }
+                else
+                {
+                    continue;
+                }
             }
 
             if (match.Offers is not null && match.Offers.Count > 0)
@@ -81,22 +93,21 @@ public abstract class NftManagerBase<T> : INftManager<T> where T : NftBase
 
             match.Minted = true;
             match.OnSale = true;
-            match.SalePrice = (int)(listing.Price / 1000000);
-            match.MarketId = listing.Id;
-            match.ListedAt = listing.CreatedAt ?? listing.UpdatedAt;
+            match.MarketName = marketName;
+            match.SalePrice = listing.SalePrice;
+            match.MarketUrl = listing.MarketUrl;
+            match.ListedAt = listing.CreatedAt ?? listing.UpdatedAt ?? match.ListedAt ?? DateTime.UtcNow;
             match.IsAuction = listing.IsAuction;
-            match.Offers = listing.Offers
-                .Select(offer => offer.Normalize())
-                .Where(offer => offer.Expires > DateTime.UtcNow)
-                .ToList();
+            match.Offers = listing.Offers;
 
             Context.Update(match);
-            processedIds.Add(edition);
+
+            processedIds.Add(listing.Edition);
         }
 
         var offMarketNfts = await Nfts
             .Include(nft => nft.Offers)
-            .Where(nft => !processedIds.Contains(nft.Edition))
+            .Where(nft => !processedIds.Contains(nft.Edition) && nft.MarketName == marketName)
             .ToListAsync();
 
         foreach (var nft in offMarketNfts)
@@ -106,12 +117,7 @@ public abstract class NftManagerBase<T> : INftManager<T> where T : NftBase
                 Context.Offers.RemoveRange(nft.Offers);
             }
 
-            nft.OnSale = false;
-            nft.SalePrice = 0;
-            nft.MarketId = null;
-            nft.ListedAt = null;
-            nft.IsAuction = false;
-            nft.Offers = new List<Offer>();
+            ResetSales(nft);
 
             Context.Update(nft);
         }
@@ -121,12 +127,10 @@ public abstract class NftManagerBase<T> : INftManager<T> where T : NftBase
 
     public virtual Task UpdateRarity()
     {
-        throw new NotImplementedException(
-            $"A custom rarity update implementation has not been provided for the {ProjectName} collection");
+        throw new NotImplementedException($"A custom rarity update implementation has not been provided for the {ProjectName} collection");
     }
 
-    protected static void CalculateAttributeScores(int nftsCount,
-        params Dictionary<string, AttributeRarityData>[] attributes)
+    protected static void CalculateAttributeScores(int nftsCount, params Dictionary<string, AttributeRarityData>[] attributes)
     {
         foreach (var attribute in attributes)
         {
@@ -139,6 +143,17 @@ public abstract class NftManagerBase<T> : INftManager<T> where T : NftBase
                 value.Percent = Math.Round(probability * 100, 2);
             }
         }
+    }
+
+    private static void ResetSales(T nft)
+    {
+        nft.OnSale = false;
+        nft.SalePrice = 0;
+        nft.MarketName = null;
+        nft.MarketUrl = null;
+        nft.ListedAt = null;
+        nft.IsAuction = false;
+        nft.Offers = new List<Offer>();
     }
 
     protected void SetRankFromScore(IEnumerable<T> nfts)

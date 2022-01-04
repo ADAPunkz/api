@@ -5,7 +5,7 @@ using NftApi.Http.Models;
 
 namespace NftApi.Http.Services;
 
-public class CnftIoClient : HttpClientBase
+public class CnftIoClient : MarketplaceClient
 {
     private const string BaseAddress = "https://api.cnft.io";
 
@@ -13,7 +13,9 @@ public class CnftIoClient : HttpClientBase
     {
     }
 
-    public async Task<List<CnftIoListing>> FetchAllListings(string projectName)
+    public override string MarketName => "CNFT.IO";
+
+    public override async Task<List<NormalizedListing>> FetchAllListings(string projectName, string tokenPrefix)
     {
         var listings = new List<CnftIoListing>();
         var payload = new CnftIoPayload
@@ -41,7 +43,7 @@ public class CnftIoClient : HttpClientBase
             response = await GetResponse(payload);
         }
 
-        return listings;
+        return listings.Select(listing => listing.Normalize(tokenPrefix)).ToList();
     }
 
     private async Task<CnftIoResponse> GetResponse(CnftIoPayload payload)
