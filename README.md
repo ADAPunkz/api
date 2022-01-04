@@ -1,10 +1,10 @@
 # ADAPunkz API
 
-This API returns rarity and sales data for the NFT collection. Sales information is updated via a webhook provided by the API that must be called to bring in new data from [CNFT.io](https://cnft.io)
+This API returns rarity and sales data for the NFT collection. Sales information is updated via a webhook provided by the API that must be called to bring in new data from [CNFT.IO](https://cnft.io) and [jpg.store](https://jpg.store)
 
 ## Requirements
 
-- [Visual Studio 2022](https://visualstudio.microsoft.com/) (.NET 6)
+- [Visual Studio 2022](https://visualstudio.microsoft.com/) (or any .NET 6 environment)
 
 ## Contributing
 
