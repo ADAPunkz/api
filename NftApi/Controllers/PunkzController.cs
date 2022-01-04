@@ -17,7 +17,7 @@ public class PunkzController : ApiControllerBase
         _punkzManager = punkzManager;
     }
 
-    [HttpGet("{id}")]
+    [HttpGet("{id:int}")]
     public async Task<ActionResult<PunkzNft>> Get(int id)
     {
         var punk = await _punkzManager.FindById(id);
@@ -51,8 +51,7 @@ public class PunkzController : ApiControllerBase
         int pageSize = 20)
     {
         var sortDirection = direction == Descending ? ListSortDirection.Descending : ListSortDirection.Ascending;
-        var nfts = _punkzManager
-            .Query
+        var nfts = _punkzManager.Query
             .WhereIf(!string.IsNullOrEmpty(background), punk => punk.Background.Value.Trim().ToLower().Replace(" ", "_") == NormalizeTrait(background))
             .WhereIf(!string.IsNullOrEmpty(type), punk => punk.Type.Value.Trim().ToLower().Replace(" ", "_") == NormalizeTrait(type))
             .WhereIf(!string.IsNullOrEmpty(mouth), punk => punk.Mouth.Value.Trim().ToLower().Replace(" ", "_") == NormalizeTrait(mouth))
@@ -81,10 +80,7 @@ public class PunkzController : ApiControllerBase
 
         return Ok(new NftList<PunkzNft>
         {
-            Results = items,
-            ResultsCount = count,
-            PageSize = pageSize,
-            NextPage = ++page
+            Results = items, ResultsCount = count, PageSize = pageSize, NextPage = ++page
         });
     }
 }

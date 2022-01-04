@@ -13,9 +13,9 @@ public interface INftManager<T> where T : NftBase
 
     Task<T> FindById(int id);
 
-    Task UpdateMint(List<GetNftsResponse> nfts);
+    Task UpdateMint(List<NftMakerProNft> nfts);
 
-    Task UpdateSales(List<CnftIoListing> listings);
+    Task UpdateSales(List<NormalizedListing> listings, string marketName, bool preferredMarket = false);
 
     Task UpdateRarity();
 }

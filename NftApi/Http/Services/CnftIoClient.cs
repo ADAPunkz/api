@@ -5,37 +5,33 @@ using NftApi.Http.Models;
 
 namespace NftApi.Http.Services;
 
-public class CnftIoClient : HttpClientBase
+public class CnftIoClient : MarketplaceClient
 {
-    private readonly HttpClient _httpClient;
+    private const string BaseAddress = "https://api.cnft.io";
 
-    public CnftIoClient(HttpClient httpClient) 
+    public CnftIoClient(HttpClient httpClient) : base(httpClient, BaseAddress)
     {
-        _httpClient = httpClient;
-        _httpClient.BaseAddress = new Uri("https://api.cnft.io");
     }
 
-    public async Task<List<CnftIoListing>> FetchAllListings(string projectName)
+    public override string MarketName => "CNFT.IO";
+
+    public override async Task<List<NormalizedListing>> FetchAllListings(string projectName, string tokenPrefix)
     {
+        var listings = new List<CnftIoListing>();
         var payload = new CnftIoPayload
         {
-            Page = 1,
-            Sold = false,
-            Verified = true,
-            Project = projectName
+            Page = 1, Sold = false, Verified = true, Project = projectName
         };
 
-        var responseMessage = await _httpClient.PostAsync("/market/listings",
-            new StringContent(
-                JsonSerializer.Serialize(payload, DefaultSerializerOptions),
-                Encoding.UTF8,
-                MediaTypeNames.Application.Json));
-
-        var response = await JsonSerializer.DeserializeAsync<CnftIoResponse>(responseMessage.Content.ReadAsStream(), DefaultSerializerOptions);
-        var listings = new List<CnftIoListing>();
+        var response = await GetResponse(payload);
 
         while (true)
         {
+            if (response is null)
+            {
+                break;
+            }
+
             if (response.Results.Count == 0)
             {
                 break;
@@ -44,15 +40,22 @@ public class CnftIoClient : HttpClientBase
             listings.AddRange(response.Results);
             payload.Page++;
 
-            responseMessage = await _httpClient.PostAsync("/market/listings",
-                new StringContent(
-                    JsonSerializer.Serialize(payload, DefaultSerializerOptions),
-                    Encoding.UTF8,
-                    MediaTypeNames.Application.Json));
-
-            response = await JsonSerializer.DeserializeAsync<CnftIoResponse>(responseMessage.Content.ReadAsStream(), DefaultSerializerOptions);
+            response = await GetResponse(payload);
         }
 
-        return listings;
+        return listings.Select(listing => listing.Normalize(tokenPrefix)).ToList();
+    }
+
+    private async Task<CnftIoResponse> GetResponse(CnftIoPayload payload)
+    {
+        var responseMessage = await HttpClient.PostAsync("/market/listings",
+            new StringContent(
+                JsonSerializer.Serialize(payload, DefaultSerializerOptions),
+                Encoding.UTF8,
+                MediaTypeNames.Application.Json));
+
+        var responseStream = await responseMessage.Content.ReadAsStreamAsync();
+
+        return await JsonSerializer.DeserializeAsync<CnftIoResponse>(responseStream, DefaultSerializerOptions);
     }
 }

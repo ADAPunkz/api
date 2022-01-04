@@ -14,5 +14,8 @@ public abstract class ApiControllerBase : ControllerBase
     protected const string OfferCount = "offerCount";
     protected const string Descending = "desc";
 
-    protected static string NormalizeTrait(string trait) => trait.Trim().ToLower().Replace(" ", "_");
+    protected static string NormalizeTrait(string trait)
+    {
+        return trait.Trim().ToLower().Replace(" ", "_");
+    }
 }

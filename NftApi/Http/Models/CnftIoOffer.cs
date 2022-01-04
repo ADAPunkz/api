@@ -13,21 +13,12 @@ public class CnftIoOffer
     public Offer Normalize()
     {
         //TODO should probably keep value in lovelace and convert on client
-        var offer = new Offer
+        return new Offer
         {
-            Value = Offer / 1000000
+            Value = Offer / 1000000,
+            Expires = Expires.ValueKind == JsonValueKind.String
+                ? DateTime.Parse(Expires.GetString() ?? string.Empty)
+                : DateTimeOffset.FromUnixTimeMilliseconds(Expires.GetInt64()).UtcDateTime
         };
-
-        // normalize the inconsistent value to a DateTime for the DB
-        if (Expires.ValueKind == JsonValueKind.String)
-        {
-            offer.Expires = DateTime.Parse(Expires.GetString());
-        }
-        else
-        {
-            offer.Expires = DateTimeOffset.FromUnixTimeMilliseconds(Expires.GetInt64()).UtcDateTime;
-        }
-
-        return offer;
     }
 }

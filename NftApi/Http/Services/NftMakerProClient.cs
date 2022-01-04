@@ -5,27 +5,23 @@ namespace NftApi.Http.Services;
 
 public class NftMakerProClient : HttpClientBase
 {
+    private const string BaseAddress = "https://api.nft-maker.io";
     private const int PageSize = 50;
 
-    private readonly HttpClient _httpClient;
-
-    public NftMakerProClient(HttpClient httpClient)
+    public NftMakerProClient(HttpClient httpClient) : base(httpClient, BaseAddress)
     {
-        _httpClient = httpClient;
-        _httpClient.BaseAddress = new Uri("https://api.nft-maker.io");
     }
 
-    public async Task<List<GetNftsResponse>> FetchAllNfts(string apiKey, string projectId)
+    public async Task<List<NftMakerProNft>> FetchAllNfts(string apiKey, string projectId)
     {
         var page = 1;
-        var responseMessage = await _httpClient.GetAsync($"/getnfts/{apiKey}/{projectId}/all/{PageSize}/{page}");
+        var results = new List<NftMakerProNft>();
 
-        var response = await JsonSerializer.DeserializeAsync<List<GetNftsResponse>>(responseMessage.Content.ReadAsStream(), DefaultSerializerOptions);
-        var results = new List<GetNftsResponse>();
+        var response = await GetResponse(apiKey, projectId, page);
 
         while (true)
         {
-            if (response.Count == 0)
+            if (response is null || response.Count == 0)
             {
                 break;
             }
@@ -33,10 +29,17 @@ public class NftMakerProClient : HttpClientBase
             results.AddRange(response);
             page++;
 
-            responseMessage = await _httpClient.GetAsync($"/getnfts/{apiKey}/{projectId}/all/{PageSize}/{page}");
-            response = await JsonSerializer.DeserializeAsync<List<GetNftsResponse>>(responseMessage.Content.ReadAsStream(), DefaultSerializerOptions);
+            response = await GetResponse(apiKey, projectId, page);
         }
 
         return results;
+    }
+
+    private async Task<List<NftMakerProNft>> GetResponse(string apiKey, string projectId, int page)
+    {
+        var responseMessage = await HttpClient.GetAsync($"/getnfts/{apiKey}/{projectId}/all/{PageSize}/{page}");
+        var responseStream = await responseMessage.Content.ReadAsStreamAsync();
+
+        return await JsonSerializer.DeserializeAsync<List<NftMakerProNft>>(responseStream, DefaultSerializerOptions);
     }
 }
