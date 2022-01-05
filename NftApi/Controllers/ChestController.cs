@@ -18,23 +18,18 @@ public class ChestController : ApiControllerBase
     }
 
     [HttpGet("[action]")]
-    public async Task<ActionResult<AddressBalance>> Balance()
+    public async Task<ActionResult<AccountBalance>> Balance()
     {
-        var address = _configuration["CommunityChestAddress"];
+        var address = _configuration["ChestStakeAddress"];
         var apiKey = _configuration["BlockfrostApiKey"];
 
-        var result = await _blockfrostClient.FetchAddressInfo(address, apiKey);
+        var result = await _blockfrostClient.FetchAccountInfo(address, apiKey);
 
-        var lovelaceAmount = result.Amount.FirstOrDefault(amount => amount.Unit == BlockfrostClient.LovelaceAmountId);
-
-        if (lovelaceAmount is null)
+        if (result is null)
         {
             return NotFound();
         }
 
-        return Ok(new AddressBalance
-        {
-            Address = address, Balance = long.Parse(lovelaceAmount.Quantity) / 1000000
-        });
+        return Ok(result.ToAccountBalance());
     }
 }

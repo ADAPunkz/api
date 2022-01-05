@@ -34,4 +34,15 @@ public abstract class NftBase
     public string MarketName { get; set; }
 
     public List<Offer> Offers { get; set; } = new();
+
+    public void ResetSale()
+    {
+        OnSale = false;
+        SalePrice = 0;
+        MarketName = null;
+        MarketUrl = null;
+        ListedAt = null;
+        IsAuction = false;
+        Offers = new();
+    }
 }
