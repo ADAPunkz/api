@@ -72,13 +72,13 @@ public abstract class NftManagerBase<T> : INftManager<T> where T : NftBase
                 continue;
             }
 
-            // when the match is currently active on another market, and this isn't a 'preferred' market, we skip
-            // if it is a preffered market, then we need to clear all existing sales data first
+            // check if this match is currently listed on another market
             if (!string.IsNullOrEmpty(match.MarketName) && match.MarketName != marketName)
             {
+                // if this is a preferred market, reset the sale, otherwise skip this entry
                 if (preferredMarket)
                 {
-                    ResetSales(match);
+                    match.ResetSale();
                 }
                 else
                 {
@@ -117,7 +117,7 @@ public abstract class NftManagerBase<T> : INftManager<T> where T : NftBase
                 Context.Offers.RemoveRange(nft.Offers);
             }
 
-            ResetSales(nft);
+            nft.ResetSale();
 
             Context.Update(nft);
         }
@@ -143,17 +143,6 @@ public abstract class NftManagerBase<T> : INftManager<T> where T : NftBase
                 value.Percent = Math.Round(probability * 100, 2);
             }
         }
-    }
-
-    private static void ResetSales(T nft)
-    {
-        nft.OnSale = false;
-        nft.SalePrice = 0;
-        nft.MarketName = null;
-        nft.MarketUrl = null;
-        nft.ListedAt = null;
-        nft.IsAuction = false;
-        nft.Offers = new List<Offer>();
     }
 
     protected void SetRankFromScore(IEnumerable<T> nfts)

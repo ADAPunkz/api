@@ -13,13 +13,13 @@ public class BlockfrostClient : HttpClientBase
     {
     }
 
-    public async Task<BlockfrostAddressInfo> FetchAddressInfo(string address, string apiKey)
+    public async Task<BlockfrostAccountInfo> FetchAccountInfo(string stakeAddress, string apiKey)
     {
         HttpClient.DefaultRequestHeaders.Add("project_id", apiKey);
 
-        var responseMessage = await HttpClient.GetAsync($"/api/v0/addresses/{address}");
+        var responseMessage = await HttpClient.GetAsync($"/api/v0/accounts/{stakeAddress}");
         var responseStream = await responseMessage.Content.ReadAsStreamAsync();
 
-        return await JsonSerializer.DeserializeAsync<BlockfrostAddressInfo>(responseStream, DefaultSerializerOptions);
+        return await JsonSerializer.DeserializeAsync<BlockfrostAccountInfo>(responseStream, DefaultSerializerOptions);
     }
 }

@@ -1,8 +1,8 @@
 ﻿namespace NftApi.Http.Models;
 
-public class AddressBalance
+public class AccountBalance
 {
-    public string Address { get; set; }
+    public string StakeAddress { get; set; }
 
     public long Balance { get; set; }
 }
