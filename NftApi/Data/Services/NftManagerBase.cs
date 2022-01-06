@@ -107,7 +107,7 @@ public abstract class NftManagerBase<T> : INftManager<T> where T : NftBase
 
         var offMarketNfts = await Nfts
             .Include(nft => nft.Offers)
-            .Where(nft => !processedIds.Contains(nft.Edition) && nft.MarketName == marketName)
+            .Where(nft => !processedIds.Contains(nft.Edition) && (nft.MarketName == marketName || string.IsNullOrEmpty(nft.MarketName)))
             .ToListAsync();
 
         foreach (var nft in offMarketNfts)
