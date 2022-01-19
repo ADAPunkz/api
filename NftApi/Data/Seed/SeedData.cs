@@ -31,63 +31,63 @@ public static class SeedData
 
         foreach (var punkzNft in enumerable)
         {
-            if (await context.Traits.FindAsync(punkzNft.Accessories.Value) is not { } accessories)
+            if (await context.PunkzTraits.FindAsync(punkzNft.Accessories.Value) is not { } accessories)
             {
-                context.Traits.Add(punkzNft.Accessories);
+                context.PunkzTraits.Add(punkzNft.Accessories);
             }
             else
             {
                 punkzNft.Accessories = accessories;
             }
 
-            if (await context.Traits.FindAsync(punkzNft.Background.Value) is not { } background)
+            if (await context.PunkzTraits.FindAsync(punkzNft.Background.Value) is not { } background)
             {
-                context.Traits.Add(punkzNft.Background);
+                context.PunkzTraits.Add(punkzNft.Background);
             }
             else
             {
                 punkzNft.Background = background;
             }
 
-            if (await context.Traits.FindAsync(punkzNft.Eyes.Value) is not { } eyes)
+            if (await context.PunkzTraits.FindAsync(punkzNft.Eyes.Value) is not { } eyes)
             {
-                context.Traits.Add(punkzNft.Eyes);
+                context.PunkzTraits.Add(punkzNft.Eyes);
             }
             else
             {
                 punkzNft.Eyes = eyes;
             }
 
-            if (await context.Traits.FindAsync(punkzNft.Head.Value) is not { } head)
+            if (await context.PunkzTraits.FindAsync(punkzNft.Head.Value) is not { } head)
             {
-                context.Traits.Add(punkzNft.Head);
+                context.PunkzTraits.Add(punkzNft.Head);
             }
             else
             {
                 punkzNft.Head = head;
             }
 
-            if (await context.Traits.FindAsync(punkzNft.ImplantNodes.Value) is not { } implantNodes)
+            if (await context.PunkzTraits.FindAsync(punkzNft.ImplantNodes.Value) is not { } implantNodes)
             {
-                context.Traits.Add(punkzNft.ImplantNodes);
+                context.PunkzTraits.Add(punkzNft.ImplantNodes);
             }
             else
             {
                 punkzNft.ImplantNodes = implantNodes;
             }
 
-            if (await context.Traits.FindAsync(punkzNft.Mouth.Value) is not { } mouth)
+            if (await context.PunkzTraits.FindAsync(punkzNft.Mouth.Value) is not { } mouth)
             {
-                context.Traits.Add(punkzNft.Mouth);
+                context.PunkzTraits.Add(punkzNft.Mouth);
             }
             else
             {
                 punkzNft.Mouth = mouth;
             }
 
-            if (await context.Traits.FindAsync(punkzNft.Type.Value) is not { } type)
+            if (await context.PunkzTraits.FindAsync(punkzNft.Type.Value) is not { } type)
             {
-                context.Traits.Add(punkzNft.Type);
+                context.PunkzTraits.Add(punkzNft.Type);
             }
             else
             {
@@ -98,6 +98,84 @@ public static class SeedData
             punkzNft.Minted = true;
 
             context.PunkzNfts.Add(punkzNft);
+        }
+
+        await context.SaveChangesAsync();
+    }
+
+    public static async Task InitializeCollage(IServiceProvider serviceProvider)
+    {
+        await using var context = new ApplicationDbContext(serviceProvider.GetRequiredService<DbContextOptions<ApplicationDbContext>>());
+
+        await context.Database.MigrateAsync();
+
+        if (context.CollageNfts.Any())
+        {
+            return;
+        }
+
+        var path = Path.Combine(Environment.CurrentDirectory, "Data", "Seed", "collages.json");
+        var text = await File.ReadAllTextAsync(path);
+        var enumerable = JsonSerializer.Deserialize<IEnumerable<CollageNft>>(text, new JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true
+        });
+
+        if (enumerable is null)
+        {
+            return;
+        }
+
+        foreach (var collageNft in enumerable)
+        {
+            if (await context.CollageTraits.FindAsync(collageNft.Frame.Value) is not { } frame)
+            {
+                context.CollageTraits.Add(collageNft.Frame);
+            }
+            else
+            {
+                collageNft.Frame = frame;
+            }
+
+            if (await context.CollageTraits.FindAsync(collageNft.Type.Value) is not { } type)
+            {
+                context.CollageTraits.Add(collageNft.Type);
+            }
+            else
+            {
+                collageNft.Type = type;
+            }
+
+            context.CollageNfts.Add(collageNft);
+        }
+
+        await context.SaveChangesAsync();
+    }
+
+    public static async Task InitializeCollageWhitelist(IServiceProvider serviceProvider)
+    {
+        await using var context = new ApplicationDbContext(serviceProvider.GetRequiredService<DbContextOptions<ApplicationDbContext>>());
+
+        await context.Database.MigrateAsync();
+
+        var path = Path.Combine(Environment.CurrentDirectory, "Data", "Seed", "collage.whitelist.json");
+        var text = await File.ReadAllTextAsync(path);
+        var enumerable = JsonSerializer.Deserialize<IEnumerable<WhitelistedAddress>>(text, new JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true
+        });
+
+        if (enumerable is null)
+        {
+            return;
+        }
+
+        foreach (var whiteListedAddress in enumerable)
+        {
+            if (await context.CollageWhitelist.FindAsync(whiteListedAddress.Value) is not { })
+            {
+                context.CollageWhitelist.Add(whiteListedAddress);
+            }
         }
 
         await context.SaveChangesAsync();

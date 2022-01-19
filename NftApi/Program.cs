@@ -20,12 +20,13 @@ builder.Services.AddHttpClient<JpgStoreClient>();
 builder.Services.AddHttpClient<BlockfrostClient>();
 
 builder.Services.AddScoped<PunkzManager>();
+builder.Services.AddScoped<CollageManager>();
 
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new OpenApiInfo
+    c.SwaggerDoc("v2", new OpenApiInfo
     {
-        Title = "ADAPunkz API", Version = "v1"
+        Title = "ADAPunkz API", Version = "v2"
     });
 });
 
@@ -44,7 +45,7 @@ else
 app.UseSwagger();
 app.UseSwaggerUI(c =>
 {
-    c.SwaggerEndpoint("/swagger/v1/swagger.json", "ADAPunkz API v1");
+    c.SwaggerEndpoint("/swagger/v2/swagger.json", "ADAPunkz API v2");
     c.RoutePrefix = string.Empty;
 });
 
@@ -58,6 +59,8 @@ var services = scope.ServiceProvider;
 try
 {
     await SeedData.InitializePunkz(services);
+    //await SeedData.InitializeCollage(services);
+    await SeedData.InitializeCollageWhitelist(services);
 }
 catch (Exception ex)
 {

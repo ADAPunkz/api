@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using NftApi.Data.Models;
+using NftApi.Http.Models;
 
 namespace NftApi.Data.Services;
 
@@ -17,8 +18,7 @@ public class PunkzManager : NftManagerBase<PunkzNft>
         .Include(punk => punk.Head)
         .Include(punk => punk.ImplantNodes)
         .Include(punk => punk.Mouth)
-        .Include(punk => punk.Type)
-        .Include(punk => punk.Offers);
+        .Include(punk => punk.Type);
 
     public new Task<PunkzNft> FindById(int id)
     {

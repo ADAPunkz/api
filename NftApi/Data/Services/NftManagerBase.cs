@@ -22,7 +22,9 @@ public abstract class NftManagerBase<T> : INftManager<T> where T : NftBase
 
     public string ProjectName { get; }
 
-    public IQueryable<T> Query => Nfts.AsQueryable();
+    public IQueryable<T> Query => Nfts
+        .AsQueryable()
+        .Include(nft => nft.Offers);
 
     public Task<T> FindById(int id)
     {
