@@ -1,4 +1,5 @@
 ﻿using System.Text.Json.Serialization;
+using NftApi.Extensions;
 
 namespace NftApi.Http.Models;
 
@@ -12,12 +13,10 @@ public class BlockfrostAccountInfo
 
     public AccountBalance ToAccountBalance()
     {
-        var lovelace = long.Parse(ControlledAmount);
-
         return new AccountBalance
         {
             StakeAddress = StakeAddress,
-            Balance = lovelace / 1000000
+            Balance = ControlledAmount.ToAda()
         };
     }
 }

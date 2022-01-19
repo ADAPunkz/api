@@ -1,4 +1,5 @@
 ﻿using System.Text.Json.Serialization;
+using NftApi.Extensions;
 
 namespace NftApi.Http.Models;
 
@@ -15,12 +16,12 @@ public class JpgStoreListing : ExternalListing
     {
         var name = Name[tokenPrefix.Length..];
         var edition = int.Parse(name);
-        var price = long.Parse(PriceLovelace);
+        var price = PriceLovelace.ToAda();
 
         return new NormalizedListing
         {
             Edition = edition,
-            SalePrice = (int)(price / 1000000),
+            SalePrice = price,
             MarketUrl = $"https://www.jpg.store/asset/{Asset}"
         };
     }

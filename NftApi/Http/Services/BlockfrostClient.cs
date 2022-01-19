@@ -22,4 +22,14 @@ public class BlockfrostClient : HttpClientBase
 
         return await JsonSerializer.DeserializeAsync<BlockfrostAccountInfo>(responseStream, DefaultSerializerOptions);
     }
+
+    public async Task<BlockfrostPoolInfo> FetchPoolInfo(string poolId, string apiKey)
+    {
+        HttpClient.DefaultRequestHeaders.Add("project_id", apiKey);
+
+        var responseMessage = await HttpClient.GetAsync($"/api/v0/pools/{poolId}");
+        var responseStream = await responseMessage.Content.ReadAsStreamAsync();
+
+        return await JsonSerializer.DeserializeAsync<BlockfrostPoolInfo>(responseStream, DefaultSerializerOptions);
+    }
 }
