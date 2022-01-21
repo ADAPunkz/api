@@ -160,7 +160,7 @@ public static class SeedData
 
         var path = Path.Combine(Environment.CurrentDirectory, "Data", "Seed", "collage.whitelist.json");
         var text = await File.ReadAllTextAsync(path);
-        var enumerable = JsonSerializer.Deserialize<IEnumerable<WhitelistedAddress>>(text, new JsonSerializerOptions
+        var enumerable = JsonSerializer.Deserialize<IEnumerable<string>>(text, new JsonSerializerOptions
         {
             PropertyNameCaseInsensitive = true
         });
@@ -172,9 +172,12 @@ public static class SeedData
 
         foreach (var whiteListedAddress in enumerable)
         {
-            if (await context.CollageWhitelist.FindAsync(whiteListedAddress.Value) is not { })
+            if (await context.CollageWhitelist.FindAsync(whiteListedAddress) is not { })
             {
-                context.CollageWhitelist.Add(whiteListedAddress);
+                context.CollageWhitelist.Add(new WhitelistedAddress
+                {
+                    Value = whiteListedAddress
+                });
             }
         }
 
