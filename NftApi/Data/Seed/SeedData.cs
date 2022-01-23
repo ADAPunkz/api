@@ -158,6 +158,13 @@ public static class SeedData
 
         await context.Database.MigrateAsync();
 
+        if (await context.CollageWhitelist.AnyAsync())
+        {
+            var existing = await context.CollageWhitelist.ToArrayAsync();
+            context.CollageWhitelist.RemoveRange(existing);
+            await context.SaveChangesAsync();
+        }
+
         var path = Path.Combine(Environment.CurrentDirectory, "Data", "Seed", "collage.whitelist.json");
         var text = await File.ReadAllTextAsync(path);
         var enumerable = JsonSerializer.Deserialize<IEnumerable<string>>(text, new JsonSerializerOptions
