@@ -30,6 +30,11 @@ public class JpgStoreClient : MarketplaceClient
 
         while (true)
         {
+            if (!response.HasMore)
+            {
+                break;
+            }
+
             if (response?.Nfts is null)
             {
                 break;
@@ -42,7 +47,14 @@ public class JpgStoreClient : MarketplaceClient
 
             listings.AddRange(response.Nfts);
 
-            payload.Cursor = response.Cursor;
+            var hadCursor = response.Cursor.TryGetInt64(out var cursor);
+
+            if (!hadCursor)
+            {
+                break;
+            }
+
+            payload.Cursor = cursor;
 
             response = await GetResponse(payload, projectName);
         }
