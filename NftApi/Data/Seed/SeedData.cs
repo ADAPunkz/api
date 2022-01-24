@@ -166,6 +166,12 @@ public static class SeedData
         }
 
         var path = Path.Combine(Environment.CurrentDirectory, "Data", "Seed", "collage.whitelist.json");
+
+        if (!File.Exists(path))
+        {
+            return;
+        }
+
         var text = await File.ReadAllTextAsync(path);
         var enumerable = JsonSerializer.Deserialize<IEnumerable<string>>(text, new JsonSerializerOptions
         {
