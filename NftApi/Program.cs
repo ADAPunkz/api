@@ -59,7 +59,7 @@ var services = scope.ServiceProvider;
 try
 {
     await SeedData.InitializePunkz(services);
-    //await SeedData.InitializeCollage(services);
+    await SeedData.InitializeCollage(services);
     await SeedData.InitializeCollageWhitelist(services);
 }
 catch (Exception ex)

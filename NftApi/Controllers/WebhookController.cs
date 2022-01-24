@@ -59,7 +59,7 @@ public class WebhookController : ApiControllerBase
     [HttpGet("mint/collage")]
     public async Task<StatusCodeResult> CollageMint()
     {
-        var apiKey = _configuration[$"NftMakerPro:Collage:ApiKey"];
+        var apiKey = _configuration[$"NftMakerPro:ApiKey"];
         var projectId = _configuration[$"NftMakerPro:Collage:ProjectId"];
 
         var results = await _nftMakerProClient.FetchAllNfts(apiKey, projectId);
