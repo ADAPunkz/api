@@ -18,7 +18,7 @@ public class WhitelistController : ApiControllerBase
     [HttpGet("check/collage/{address}")]
     public async Task<ActionResult<WhitelistCheck>> CollageWhitelist(string address)
     {
-        var count = await _collageWhitelist.CountAsync(row => row.Value == address);
+        var count = await _collageWhitelist.CountAsync(row => row.Value.Trim().ToLower() == address.Trim().ToLower());
 
         return Ok(new WhitelistCheck
         {
