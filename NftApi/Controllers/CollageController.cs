@@ -68,6 +68,7 @@ public class CollageController : ApiControllerBase
             .OrderByPriceIf(sort == Price, sortDirection)
             .OrderByListedAtIf(sort == ListedAt, sortDirection)
             .OrderByOfferCountIf(sort == OfferCount, sortDirection)
+            .OrderByMintedAtIf(sort == MintedAt, sortDirection)
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
             .Cast<CollageNft>()
