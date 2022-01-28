@@ -97,11 +97,11 @@ public class CollageController : ApiControllerBase
 
     [HttpGet("mint/address")]
     [ApiExplorerSettings(IgnoreApi = true)]
-    public ActionResult<MintingAddress> MintAddress(string r)
+    public ActionResult<MintingAddress> MintAddress()
     {
         var mintLaunch = new DateTime(2022, 1, 28, 19, 00, 00, DateTimeKind.Utc);
 
-        if (DateTime.UtcNow < mintLaunch && string.IsNullOrEmpty(r))
+        if (DateTime.UtcNow < mintLaunch)
         {
             return Ok(new MintingAddress
             {
