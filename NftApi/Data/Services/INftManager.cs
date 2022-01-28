@@ -18,4 +18,6 @@ public interface INftManager<T> where T : NftBase
     Task UpdateSales(List<NormalizedListing> listings, string marketName, bool preferredMarket = false);
 
     Task UpdateRarity();
+
+    Task<bool> CheckWhitelist(string address);
 }

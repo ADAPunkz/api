@@ -2,7 +2,7 @@
 
 public class CollageNft : NftBase
 {
-    public Trait Frame { get; set; }
+    public Trait Tier { get; set; }
 
     public Trait Type { get; set; }
 }

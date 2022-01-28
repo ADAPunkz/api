@@ -132,6 +132,11 @@ public abstract class NftManagerBase<T> : INftManager<T> where T : NftBase
         throw new NotImplementedException($"A custom rarity update implementation has not been provided for the {ProjectName} collection");
     }
 
+    public virtual Task<bool> CheckWhitelist(string address)
+    {
+        throw new NotImplementedException($"A whitelist checking implementation has not been provided for the {ProjectName} collection");
+    }
+
     protected static void CalculateAttributeScores(int nftsCount, params Dictionary<string, AttributeRarityData>[] attributes)
     {
         foreach (var attribute in attributes)
@@ -147,7 +152,7 @@ public abstract class NftManagerBase<T> : INftManager<T> where T : NftBase
         }
     }
 
-    protected void SetRankFromScore(IEnumerable<T> nfts)
+    protected virtual void SetRankFromScore(IEnumerable<T> nfts)
     {
         var ordered = nfts
             .OrderByDescending(nft => nft.Score)

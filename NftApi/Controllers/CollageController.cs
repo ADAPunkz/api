@@ -10,10 +10,15 @@ namespace NftApi.Controllers;
 
 public class CollageController : ApiControllerBase
 {
+    private readonly IConfiguration _configuration;
+
     private readonly CollageManager _collageManager;
 
-    public CollageController(CollageManager collageManager)
+    public CollageController(
+        IConfiguration configuration,
+        CollageManager collageManager)
     {
+        _configuration = configuration;
         _collageManager = collageManager;
     }
 
@@ -47,7 +52,7 @@ public class CollageController : ApiControllerBase
     {
         var sortDirection = direction == Descending ? ListSortDirection.Descending : ListSortDirection.Ascending;
         var nfts = _collageManager.Query
-            .WhereIf(!string.IsNullOrEmpty(frame), collage => collage.Frame.Value.Trim().ToLower().Replace(" ", "_") == NormalizeTrait(frame))
+            .WhereIf(!string.IsNullOrEmpty(frame), collage => collage.Tier.Value.Trim().ToLower().Replace(" ", "_") == NormalizeTrait(frame))
             .WhereIf(!string.IsNullOrEmpty(type), collage => collage.Type.Value.Trim().ToLower().Replace(" ", "_") == NormalizeTrait(type))
             .WhereIf(minRank > 0, collage => collage.Rank >= minRank)
             .WhereIf(maxRank > 0, collage => collage.Rank <= maxRank)
@@ -74,6 +79,42 @@ public class CollageController : ApiControllerBase
             ResultsCount = count,
             PageSize = pageSize,
             NextPage = ++page
+        });
+    }
+
+    [HttpGet("mint/whitelist/{address}")]
+    [ApiExplorerSettings(IgnoreApi = true)]
+    public async Task<ActionResult<WhitelistCheck>> MintWhitelist(string address)
+    {
+        var isWhitelisted = await _collageManager.CheckWhitelist(address);
+
+        return Ok(new WhitelistCheck
+        {
+            Address = address,
+            IsWhitelisted = isWhitelisted
+        });
+    }
+
+    [HttpGet("mint/address")]
+    [ApiExplorerSettings(IgnoreApi = true)]
+    public ActionResult<MintingAddress> MintAddress(string r)
+    {
+        var mintLaunch = new DateTime(2022, 1, 28, 19, 00, 00, DateTimeKind.Utc);
+
+        if (DateTime.UtcNow < mintLaunch && string.IsNullOrEmpty(r))
+        {
+            return Ok(new MintingAddress
+            {
+                IsActive = false
+            });
+        }
+
+        var address = _configuration["CollageMintAddress"];
+
+        return Ok(new MintingAddress
+        {
+            Address = address,
+            IsActive = true
         });
     }
 }

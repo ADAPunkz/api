@@ -12,7 +12,7 @@ public static class SeedData
 
         await context.Database.MigrateAsync();
 
-        if (context.PunkzNfts.Any())
+        if (await context.PunkzNfts.AnyAsync())
         {
             return;
         }
@@ -109,7 +109,7 @@ public static class SeedData
 
         await context.Database.MigrateAsync();
 
-        if (context.CollageNfts.Any())
+        if (await context.CollageNfts.AnyAsync())
         {
             return;
         }
@@ -128,13 +128,13 @@ public static class SeedData
 
         foreach (var collageNft in enumerable)
         {
-            if (await context.CollageTraits.FindAsync(collageNft.Frame.Value) is not { } frame)
+            if (await context.CollageTraits.FindAsync(collageNft.Tier.Value) is not { } frame)
             {
-                context.CollageTraits.Add(collageNft.Frame);
+                context.CollageTraits.Add(collageNft.Tier);
             }
             else
             {
-                collageNft.Frame = frame;
+                collageNft.Tier = frame;
             }
 
             if (await context.CollageTraits.FindAsync(collageNft.Type.Value) is not { } type)
