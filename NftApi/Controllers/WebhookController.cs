@@ -35,10 +35,10 @@ public class WebhookController : ApiControllerBase
     [HttpGet("sales/punkz")]
     public async Task<StatusCodeResult> PunkzSales()
     {
-        var cnftListings = await _cnftIoClient.FetchAllListings(_punkzManager.ProjectName, _punkzManager.TokenPrefix);
+        //var cnftListings = await _cnftIoClient.FetchAllListings(_punkzManager.ProjectName, _punkzManager.TokenPrefix);
         var jpgStoreListings = await _jpgStoreClient.FetchAllListings(_punkzManager.ProjectName, _punkzManager.TokenPrefix);
 
-        await _punkzManager.UpdateSales(cnftListings, _cnftIoClient.MarketName);
+        //await _punkzManager.UpdateSales(cnftListings, _cnftIoClient.MarketName);
         await _punkzManager.UpdateSales(jpgStoreListings, _jpgStoreClient.MarketName, preferredMarket: true);
 
         return StatusCode(200);
@@ -47,10 +47,10 @@ public class WebhookController : ApiControllerBase
     [HttpGet("sales/collage")]
     public async Task<StatusCodeResult> CollageSales()
     {
-        var cnftListings = await _cnftIoClient.FetchAllListings(_collageManager.ProjectName, _collageManager.TokenPrefix);
+        //var cnftListings = await _cnftIoClient.FetchAllListings(_collageManager.ProjectName, _collageManager.TokenPrefix);
         var jpgStoreListings = await _jpgStoreClient.FetchAllListings(_collageManager.ProjectName, _collageManager.TokenPrefix);
 
-        await _collageManager.UpdateSales(cnftListings, _cnftIoClient.MarketName);
+        //await _collageManager.UpdateSales(cnftListings, _cnftIoClient.MarketName);
         await _collageManager.UpdateSales(jpgStoreListings, _jpgStoreClient.MarketName, preferredMarket: true);
 
         return StatusCode(200);
