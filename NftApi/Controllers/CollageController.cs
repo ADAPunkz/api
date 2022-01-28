@@ -8,6 +8,7 @@ using NftApi.Http.Models;
 
 namespace NftApi.Controllers;
 
+[ApiExplorerSettings(IgnoreApi = true)]
 public class CollageController : ApiControllerBase
 {
     private readonly IConfiguration _configuration;
