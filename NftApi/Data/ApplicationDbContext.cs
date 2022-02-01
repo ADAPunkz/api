@@ -13,9 +13,9 @@ public class ApplicationDbContext : DbContext
 
     public virtual DbSet<CollageNft> CollageNfts { get; set; }
 
-    public virtual DbSet<Trait> PunkzTraits { get; set; }
+    public virtual DbSet<PunkzTrait> PunkzTraits { get; set; }
 
-    public virtual DbSet<Trait> CollageTraits { get; set; }
+    public virtual DbSet<CollageTrait> CollageTraits { get; set; }
 
     public virtual DbSet<Offer> Offers { get; set; }
 

@@ -9,4 +9,6 @@ public class NftMakerProNft
     public string GatewayLink { get; set; }
 
     public bool Minted { get; set; }
+
+    public DateTime? Selldate { get; set; }
 }

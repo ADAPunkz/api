@@ -48,7 +48,7 @@ public abstract class NftManagerBase<T> : INftManager<T> where T : NftBase
 
             if (nft.Minted && !match.MintedAt.HasValue)
             {
-                match.MintedAt = DateTime.UtcNow;
+                match.MintedAt = nft.Selldate ?? DateTime.UtcNow;
             }
 
             match.Ipfs = nft.IpfsLink;

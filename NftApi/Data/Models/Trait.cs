@@ -2,10 +2,18 @@
 
 namespace NftApi.Data.Models;
 
-public class Trait
+public abstract class Trait
 {
     [Key]
     public string Value { get; set; }
 
     public decimal Percent { get; set; }
+}
+
+public class PunkzTrait : Trait
+{
+}
+
+public class CollageTrait : Trait
+{
 }

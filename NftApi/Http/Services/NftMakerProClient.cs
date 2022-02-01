@@ -19,7 +19,7 @@ public class NftMakerProClient : HttpClientBase
 
         var response = await GetResponse(apiKey, projectId, page);
 
-        while (true)
+        /*while (true)
         {
             if (response is null || response.Count == 0)
             {
@@ -30,14 +30,14 @@ public class NftMakerProClient : HttpClientBase
             page++;
 
             response = await GetResponse(apiKey, projectId, page);
-        }
+        }*/
 
-        return results;
+        return response;
     }
 
     private async Task<List<NftMakerProNft>> GetResponse(string apiKey, string projectId, int page)
     {
-        var responseMessage = await HttpClient.GetAsync($"/getnfts/{apiKey}/{projectId}/all/{PageSize}/{page}");
+        var responseMessage = await HttpClient.GetAsync($"/getnfts/{apiKey}/{projectId}/all");
         var responseStream = await responseMessage.Content.ReadAsStreamAsync();
 
         return await JsonSerializer.DeserializeAsync<List<NftMakerProNft>>(responseStream, DefaultSerializerOptions);
