@@ -1,6 +1,6 @@
 # ADAPunkz API
 
-This API returns rarity and sales data for the NFT collection. Sales information is updated via a webhook provided by the API that must be called to bring in new data from [CNFT.IO](https://cnft.io) and [jpg.store](https://jpg.store)
+This API returns rarity and sales data for the NFT collection. Mint and sales information is updated via a background service bringing in new data from [NFT Maker PRO](https://pro.nft-maker.io), [CNFT.IO](https://cnft.io) and [jpg.store](https://jpg.store)
 
 ## Requirements
 
