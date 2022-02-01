@@ -1,5 +1,6 @@
 ﻿using NftApi.Data.Models;
 using NftApi.Http.Models;
+using NftApi.Http.Models.NftMakerPro;
 
 namespace NftApi.Data.Services;
 

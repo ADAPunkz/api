@@ -2,6 +2,7 @@
 using System.Text;
 using System.Text.Json;
 using NftApi.Http.Models;
+using NftApi.Http.Models.CnftIo;
 
 namespace NftApi.Http.Services;
 

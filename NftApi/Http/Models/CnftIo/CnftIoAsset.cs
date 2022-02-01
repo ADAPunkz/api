@@ -1,4 +1,4 @@
-﻿namespace NftApi.Http.Models;
+﻿namespace NftApi.Http.Models.CnftIo;
 
 public class CnftIoAsset
 {

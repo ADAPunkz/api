@@ -1,5 +1,5 @@
 ﻿using System.Text.Json;
-using NftApi.Http.Models;
+using NftApi.Http.Models.NftMakerPro;
 
 namespace NftApi.Http.Services;
 

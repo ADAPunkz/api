@@ -1,6 +1,6 @@
 ﻿using System.Text.Json;
 
-namespace NftApi.Http.Models;
+namespace NftApi.Http.Models.JpgStore;
 
 public class JpgStoreResponse
 {

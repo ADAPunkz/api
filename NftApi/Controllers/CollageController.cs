@@ -36,7 +36,7 @@ public class CollageController : ApiControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<NftList<CollageNft>>> Get(
+    public async Task<ActionResult<ListResponse<CollageNft>>> Get(
         string frame,
         string type,
         string sort,
@@ -74,7 +74,7 @@ public class CollageController : ApiControllerBase
             .Cast<CollageNft>()
             .ToListAsync();
 
-        return Ok(new NftList<CollageNft>
+        return Ok(new ListResponse<CollageNft>
         {
             Results = items,
             ResultsCount = count,

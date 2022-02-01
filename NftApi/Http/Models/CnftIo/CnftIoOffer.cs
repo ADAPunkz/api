@@ -1,7 +1,7 @@
 ﻿using System.Text.Json;
 using NftApi.Data.Models;
 
-namespace NftApi.Http.Models;
+namespace NftApi.Http.Models.CnftIo;
 
 public class CnftIoOffer
 {

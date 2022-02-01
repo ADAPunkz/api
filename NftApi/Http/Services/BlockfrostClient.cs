@@ -1,5 +1,5 @@
 ﻿using System.Text.Json;
-using NftApi.Http.Models;
+using NftApi.Http.Models.Blockfrost;
 
 namespace NftApi.Http.Services;
 

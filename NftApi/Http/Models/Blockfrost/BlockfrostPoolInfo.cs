@@ -1,7 +1,7 @@
 ﻿using System.Text.Json.Serialization;
 using NftApi.Extensions;
 
-namespace NftApi.Http.Models;
+namespace NftApi.Http.Models.Blockfrost;
 
 public class BlockfrostPoolInfo
 {

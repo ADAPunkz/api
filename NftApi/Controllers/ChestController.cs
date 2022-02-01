@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using NftApi.Http.Models;
+using NftApi.Http.Models.Blockfrost;
 using NftApi.Http.Services;
 
 namespace NftApi.Controllers;

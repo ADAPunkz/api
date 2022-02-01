@@ -31,7 +31,7 @@ public class PunkzController : ApiControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<NftList<PunkzNft>>> Get(
+    public async Task<ActionResult<ListResponse<PunkzNft>>> Get(
         string background,
         string type,
         string mouth,
@@ -78,7 +78,7 @@ public class PunkzController : ApiControllerBase
             .Cast<PunkzNft>()
             .ToListAsync();
 
-        return Ok(new NftList<PunkzNft>
+        return Ok(new ListResponse<PunkzNft>
         {
             Results = items, ResultsCount = count, PageSize = pageSize, NextPage = ++page
         });

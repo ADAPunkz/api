@@ -1,4 +1,4 @@
-﻿namespace NftApi.Http.Models;
+﻿namespace NftApi.Http.Models.NftMakerPro;
 
 public class NftMakerProNft
 {

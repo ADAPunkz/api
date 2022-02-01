@@ -1,11 +1,14 @@
 ﻿using System.Text.Json.Serialization;
 using NftApi.Extensions;
 
-namespace NftApi.Http.Models;
+namespace NftApi.Http.Models.JpgStore;
 
 public class JpgStoreListing : ExternalListing
 {
     public string Asset { get; set; }
+
+    [JsonPropertyName("asset_id")]
+    public string AssetId { get; set; }
 
     public string Name { get; set; }
 
@@ -22,7 +25,7 @@ public class JpgStoreListing : ExternalListing
         {
             Edition = edition,
             SalePrice = price,
-            MarketUrl = $"https://www.jpg.store/asset/{Asset}"
+            MarketUrl = $"https://www.jpg.store/asset/{Asset ?? AssetId}"
         };
     }
 }

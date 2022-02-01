@@ -22,6 +22,8 @@ builder.Services.AddHttpClient<BlockfrostClient>();
 builder.Services.AddScoped<PunkzManager>();
 builder.Services.AddScoped<CollageManager>();
 
+builder.Services.AddHostedService<WebScraperService>();
+
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v2", new OpenApiInfo

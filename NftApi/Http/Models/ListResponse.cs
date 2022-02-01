@@ -1,8 +1,6 @@
-﻿using NftApi.Data.Models;
+﻿namespace NftApi.Http.Models;
 
-namespace NftApi.Http.Models;
-
-public class NftList<T> where T : NftBase
+public class ListResponse<T> where T : class
 {
     public List<T> Results { get; set; }
 

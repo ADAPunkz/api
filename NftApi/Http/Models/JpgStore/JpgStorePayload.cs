@@ -1,7 +1,7 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace NftApi.Http.Models;
+namespace NftApi.Http.Models.JpgStore;
 
 public class JpgStorePayload
 {
