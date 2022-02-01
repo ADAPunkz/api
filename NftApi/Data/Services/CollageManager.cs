@@ -7,7 +7,7 @@ namespace NftApi.Data.Services;
 public class CollageManager : NftManagerBase<CollageNft>
 {
     public CollageManager(ApplicationDbContext dbContext)
-        : base(dbContext, dbContext.CollageNfts, "ADAPunkzMVP", "ADAPunkzMVP")
+        : base(dbContext, dbContext.CollageNfts, "ADAPunkzMetaversePass", "ADAPunkzMVP")
     {
     }
 

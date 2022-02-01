@@ -20,16 +20,24 @@ public class ChestController : ApiControllerBase
     [HttpGet("[action]")]
     public async Task<ActionResult<AccountBalance>> Balance()
     {
-        var address = _configuration["ChestStakeAddress"];
+        var addresses = _configuration["ChestStakeAddress"].Split(',');
         var apiKey = _configuration["BlockfrostApiKey"];
 
-        var result = await _blockfrostClient.FetchAccountInfo(address, apiKey);
+        var requests = new List<Task<BlockfrostAccountInfo>>();
 
-        if (result is null)
+        foreach (var address in addresses)
         {
-            return NotFound();
+            requests.Add(_blockfrostClient.FetchAccountInfo(address, apiKey));
         }
 
-        return Ok(result.ToAccountBalance());
+        var results = await Task.WhenAll(requests);
+        var balance = new AccountBalance();
+
+        foreach (var result in results)
+        {
+            balance.Balance += result.ToAccountBalance().Balance;
+        }
+
+        return Ok(balance);
     }
 }
