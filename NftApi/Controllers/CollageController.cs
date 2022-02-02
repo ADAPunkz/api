@@ -83,6 +83,19 @@ public class CollageController : ApiControllerBase
         });
     }
 
+    [HttpGet("[action]")]
+    public async Task<ActionResult<Dictionary<string, List<Trait>>>> Traits()
+    {
+        var types = await _collageManager.GetTypes();
+        var tiers = await _collageManager.GetTiers();
+
+        return Ok(new Dictionary<string, List<CollageTrait>>
+        {
+            { "types", types },
+            { "tiers", tiers }
+        });
+    }
+
     [HttpGet("mint/whitelist/{address}")]
     [ApiExplorerSettings(IgnoreApi = true)]
     public async Task<ActionResult<WhitelistCheck>> MintWhitelist(string address)

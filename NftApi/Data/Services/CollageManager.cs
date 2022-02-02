@@ -21,6 +21,20 @@ public class CollageManager : NftManagerBase<CollageNft>
         return Query.FirstOrDefaultAsync(nft => nft.Edition == id);
     }
 
+    public Task<List<CollageTrait>> GetTypes()
+    {
+        return Context.CollageTraits
+            .Where(t => Query.Any(n => n.Type == t))
+            .ToListAsync();
+    }
+
+    public Task<List<CollageTrait>> GetTiers()
+    {
+        return Context.CollageTraits
+            .Where(t => Query.Any(n => n.Tier == t))
+            .ToListAsync();
+    }
+
     public override async Task UpdateMint(List<NftMakerProNft> response)
     {
         await base.UpdateMint(response);
