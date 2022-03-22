@@ -5,6 +5,7 @@ using NftApi.Data.Models;
 using NftApi.Data.Services;
 using NftApi.Extensions;
 using NftApi.Http.Models;
+using NftApi.Mvc.Filters;
 
 namespace NftApi.Controllers;
 
@@ -18,6 +19,7 @@ public class PunkzController : ApiControllerBase
     }
 
     [HttpGet("{id:int}")]
+    [TypeFilter(typeof(WalletAuthorizeFilter))]
     public async Task<ActionResult<PunkzNft>> Get(int id)
     {
         var punk = await _punkzManager.FindById(id);
